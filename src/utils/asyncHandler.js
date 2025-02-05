@@ -1,11 +1,11 @@
 const asyncHandler = (requestHandler) => {
-    (req, res, next) => {
-        Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err))
-    }
-}
+  (req, res, next) => {
+    Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
+  };
+};
 //This version passes the error to the next middleware
 
-export {asyncHandler}
+export { asyncHandler };
 
 //this version sends a JSON response with error message and status code
 // wrapper function using async/await
