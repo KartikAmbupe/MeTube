@@ -21,38 +21,44 @@ const registerUser = asyncHandler(async (req, res) => {
   // return response
 
   //user details
-  const {fullname, username, email, password} = req.body;
-  console.log("Name:", fullname + " Email:", email)
+  const { fullname, username, email, password } = req.body;
+  console.log("Name:", fullname + " Email:", email);
 
   //validation
   // if(fullname === ""){
   //   throw new ApiError(400, "fullname is required");
   // }
   //another method(advanced)
-  if([fullname, username, email, password].some((field) => //some method returns true if at least one element in array passes the test, so here it return true if any of the field is empty
-      field?.trim() === "")){//? is optional chaining operator, which checks if the field is undefined or null and returns undefined instead of throwing an error
-        throw new ApiError(400, "All fields are required");
-      }
+  if (
+    [fullname, username, email, password].some(
+      (
+        field //some method returns true if at least one element in array passes the test, so here it return true if any of the field is empty
+      ) => field?.trim() === ""
+    )
+  ) {
+    //? is optional chaining operator, which checks if the field is undefined or null and returns undefined instead of throwing an error
+    throw new ApiError(400, "All fields are required");
+  }
 
   const existedUser = User.findOne({
-    $or: [{ username }, { email }]
-  })
+    $or: [{ username }, { email }],
+  });
 
-  if(existedUser){
+  if (existedUser) {
     throw new ApiError(409, "User with same username or email already exists");
   }
 
-  const avatarLocalPath = req.files?.avatar[0]?.path; //? is optional chaining operator, 
+  const avatarLocalPath = req.files?.avatar[0]?.path; //? is optional chaining operator,
   const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
-  if(!avatarLocalPath){
+  if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is required");
   }
 
   const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = await uploadOnCloudinary(coverImageLocalPath);
 
-  if(!avatar){
+  if (!avatar) {
     throw new ApiError(400, "Avatar file is required");
   }
 
@@ -63,18 +69,20 @@ const registerUser = asyncHandler(async (req, res) => {
     coverImage: coverImage?.url || "",
     email,
     password,
-    username: username.toLowerCase()
-  })
+    username: username.toLowerCase(),
+  });
 
-  const createdUser = await User.findById(user._id).select("-password -refreshToken ")// password and refreshtoken fields will be excluded from the returned doc
+  const createdUser = await User.findById(User._id).select(
+    "-password -refreshToken "
+  ); // password and refreshtoken fields will be excluded from the returned doc
 
-  if(!createdUser){
+  if (!createdUser) {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
-  return res.status(201).json(
-    new ApiResponse(200, createdUser, "User registered successfully")
-  )
+  return res
+    .status(201)
+    .json(new ApiResponse(200, createdUser, "User registered successfully"));
 });
 
-export {registerUser};
+export { registerUser };
