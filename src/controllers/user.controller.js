@@ -22,7 +22,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   //user details
   const { fullname, username, email, password } = req.body;
-  console.log("Name:", fullname + " Email:", email);
+  // console.log("Name:", fullname + " Email:", email);
 
   //validation
   // if(fullname === ""){
@@ -41,7 +41,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const existedUser = User.findOne({
-    $or: [{ username }, { email }],
+    $or: [{ username }, { email }]
   });
 
   if (existedUser) {
@@ -49,7 +49,7 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   const avatarLocalPath = req.files?.avatar[0]?.path; //? is optional chaining operator,
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  // const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
   if (!avatarLocalPath) {
     throw new ApiError(400, "Avatar file is required");
@@ -72,7 +72,7 @@ const registerUser = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
   });
 
-  const createdUser = await User.findById(User._id).select(
+  const createdUser = await User.findById(user._id).select(
     "-password -refreshToken "
   ); // password and refreshtoken fields will be excluded from the returned doc
 
